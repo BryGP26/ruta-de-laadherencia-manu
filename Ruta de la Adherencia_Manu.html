@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Ruta de la Adherencia | Asociación MANU</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1e3a8a; 
+            --secondary-color: #0284c7;
+            --success-color: #16a34a;
+            --warning-color: #ea580c;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            
+            --any-williams: #f59e0b;
+            --chepe-bana: #3b82f6;
+            --iafa: #8b5cf6;
+            --dormitorio: #64748b;
+            --salud: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 60px; }
+
+        /* PANTALLA DE BLOQUEO (LOGIN) */
+        #loginScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); display: flex; justify-content: center;
+            align-items: center; z-index: 9999; transition: opacity 0.3s ease;
+        }
+        .login-card {
+            background: #1e293b; color: white; padding: 40px 30px; border-radius: 16px;
+            width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .login-card h2 { color: #38bdf8; font-size: 1.4rem; margin-bottom: 5px; border: none; padding: 0; }
+        .login-card p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 25px; }
+        .login-field { margin-bottom: 20px; text-align: left; }
+        .login-field label { color: #cbd5e1; font-weight: 500; margin-bottom: 6px; }
+        .login-field input { background: #334155; border: 1px solid #475569; color: white; padding: 12px; width: 100%; border-radius: 8px; }
+        .login-field input:focus { border-color: #38bdf8; outline: none; }
+        .login-error { color: #f87171; font-size: 0.85rem; margin-top: 10px; display: none; font-weight: bold; }
+
+        /* SISTEMA PRINCIPAL */
+        #mainSystem { display: none; }
+
+        header {
+            background-color: var(--primary-color); color: white; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .logo-area h1 { font-size: 1.3rem; font-weight: 700; }
+        .logo-area span { font-size: 0.8rem; opacity: 0.8; }
+
+        main { max-width: 1300px; margin: 20px auto; padding: 0 15px; }
+
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+
+        h2 {
+            font-size: 1.1rem; color: var(--primary-color); margin-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; display: flex; align-items: center;
+        }
+        h2 i { margin-right: 8px; }
+
+        .status-badge { padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; margin-bottom: 15px; display: none; }
+        .status-badge.nuevo { background-color: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+        .status-badge.existing { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px; }
+        
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #475569; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; color: var(--text-color); background: #fff; }
+        input:focus, select:focus, textarea:focus { border-color: var(--secondary-color); outline: none; }
+        
+        .seccion-desactivada { opacity: 0.25; pointer-events: none !important; }
+        .seccion-oculta { display: none !important; }
+
+        button {
+            padding: 11px 18px; border-radius: 8px; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; border: none; transition: 0.2s;
+        }
+        .btn-primary { background-color: var(--secondary-color); color: white; width: 100%; }
+        .btn-success { background-color: var(--success-color); color: white; width: 100%; }
+        .btn-warning { background-color: var(--warning-color); color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
+        .btn-logout { background-color: #ef4444; color: white; padding: 8px 15px; font-size: 0.85rem; }
+        .btn-tool { background-color: #475569; color: white; font-size: 0.85rem; padding: 8px 14px; gap: 6px; }
+        .btn-tool:hover { background-color: #334155; }
+        button:hover { opacity: 0.9; }
+        
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; color: white; text-transform: uppercase; }
+        .badge-any { background-color: var(--any-williams); }
+        .badge-chepe { background-color: var(--chepe-bana); }
+        .badge-iafa { background-color: var(--iafa); }
+        .badge-dormitorio { background-color: var(--dormitorio); }
+        .badge-salud { background-color: var(--salud); }
+
+        .mov-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: white; text-transform: uppercase; display: inline-block; }
+        .mov-ingreso { background-color: var(--success-color); }
+        .mov-egreso { background-color: var(--warning-color); }
+
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        th { background-color: #f1f5f9; font-weight: 600; color: #475569; }
+
+        .btn-delete { background: transparent; color: #ef4444; padding: 4px; border: none; cursor: pointer; }
+        .btn-delete:hover { background: #ffeeee; border-radius: 4px; }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); position: relative;
+        }
+        .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; color: #94a3b8; }
+        
+        .section-divider {
+            font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase;
+            margin: 15px 0 8px 0; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;
+        }
+
+        #globalHistoryContainer { max-width: 1300px; margin: 20px auto; padding: 0 15px; display: block; }
+
+        .filter-bar {
+            background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+            align-items: end; border: 1px solid #e2e8f0;
+        }
+        .filter-bar .form-group { margin-bottom: 0; }
+        .filter-bar label { font-size: 0.8rem; color: #64748b; font-weight: 700; }
+
+        .backup-panel {
+            background: #eff6ff; border: 1px dashed #3b82f6; padding: 15px; border-radius: 8px;
+            margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🔐 CAPA DE AUTENTICACIÓN -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);">
+                <i class="material-icons" style="font-size: 2rem; color: #38bdf8;">security</i>
+            </div>
+            <h2>ASOCIACIÓN MANU</h2>
+            <p>Acceso Restringido · Control Operacional en Campo</p>
+            
+            <form onsubmit="validarCredenciales(event)">
+                <div class="login-field">
+                    <label for="inputUser">Usuario Operativo</label>
+                    <input type="text" id="inputUser" placeholder="Ingrese su usuario" required autocomplete="off">
+                </div>
+                <div class="login-field">
+                    <label for="inputPass">Contraseña de Seguridad</label>
+                    <input type="password" id="inputPass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="background-color: var(--secondary-color); margin-top: 10px;">
+                    <i class="material-icons" style="margin-right: 8px;">lock_open</i> Ingresar al Sistema
+                </button>
+                <div id="errorMsg" class="login-error">⚠️ Credenciales incorrectas. Verifique e intente de nuevo.</div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 🖥️ ENTORNO DEL SISTEMA GENERAL -->
+    <div id="mainSystem">
+        <header>
+            <div class="logo-area">
+                <h1>LA RUTA DE LA ADHERENCIA</h1>
+                <span>Asociación MANU | Monitoreo de Trazabilidad Integral</span>
+            </div>
+            <div>
+                <button class="btn-logout" onclick="cerrarSesionManual()"><i class="material-icons" style="margin-right:5px; font-size:1.1rem;">power_settings_new</i> Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- SECCIÓN 1: BUSCADOR FLEXIBLE -->
+            <div class="card">
+                <h2><i class="material-icons">search</i> 1. Verificación del Habitante</h2>
+                <div class="form-group">
+                    <label for="cedulaBusqueda">Ingrese Cédula Completa o Nombre Completo Exacto</label>
+                    <input type="text" id="cedulaBusqueda" placeholder="Escriba el criterio exacto para verificar..." autocomplete="off">
+                </div>
+
+                <div id="badgeNuevo" class="status-badge nuevo">✨ Habitante NO registrado. Complete la Ficha de Primera Vez para darlo de alta en el sistema.</div>
+                <div id="badgeExistente" class="status-badge existing">✅ Habitante localizado con éxito. Ficha general omitida; Panel de Movimiento Comunitario desbloqueado.</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                
+                <!-- SECCIÓN 2: REGISTRO MAESTRO -->
+                <div class="card" id="seccionFicha">
+                    <h2><i class="material-icons">person_add</i> 2. Ficha de Primera Vez</h2>
+                    <form id="formFicha" onsubmit="registrarNuevoHabitante(event)">
+                        
+                        <div class="section-divider">Datos de Identidad</div>
+                        <div class="form-group">
+                            <label for="nombreCompleto">Nombre Completo</label>
+                            <input type="text" id="nombreCompleto">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nacimiento">Fecha de Nacimiento</label>
+                                <input type="date" id="nacimiento">
+                            </div>
+                            <div class="form-group">
+                                <label for="aseguramiento">Aseguramiento (CCSS)</label>
+                                <select id="aseguramiento">
+                                    <option value="No Asegurado">No Asegurado / Pendiente</option>
+                                    <option value="Asalariado / Directo">Asalariado / Directo</option>
+                                    <option value="Por el Estado">Asegurado por el Estado</option>
+                                    <option value="Convenio MANU">Convenio Especial / Humanitario</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="section-divider">Ubicación / Residencia Habitual</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="provincia">Provincia</label>
+                                <select id="provincia">
+                                    <option value="San José">San José</option>
+                                    <option value="Alajuela">Alajuela</option>
+                                    <option value="Cartago">Cartago</option>
+                                    <option value="Heredia">Heredia</option>
+                                    <option value="Guanacaste">Guanacaste</option>
+                                    <option value="Puntarenas">Puntarenas</option>
+                                    <option value="Limón">Limón</option>
+                                    <option value="Situación de Calle">En situación de Calle Activa</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="canton">Cantón</label>
+                                <input type="text" id="canton" placeholder="Ej: Central, Goicoechea...">
+                            </div>
+                            <div class="form-group">
+                                <label for="distrito">Distrito</label>
+                                <input type="text" id="distrito" placeholder="Ej: Hospital, Pavas...">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="otrasSenas">Otras Señas / Punto de Referencia Frecuente</label>
+                            <textarea id="otrasSenas" rows="2" placeholder="Ej: Detrás de la iglesia, parque central, carpa específica..."></textarea>
+                        </div>
+
+                        <div class="section-divider">Contactos de Emergencia / Referencias</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombreReferencia">Persona de Contacto</label>
+                                <input type="text" id="nombreReferencia" placeholder="Nombre de familiar o red de apoyo">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefonoReferencia">Número(s) de Teléfono</label>
+                                <input type="text" id="telefonoReferencia" placeholder="Ej: 8888-8888 / 2222-2222">
+                            </div>
+                        </div>
+
+                        <div class="section-divider">Alertas Médicas</div>
+                        <div class="form-group">
+                            <label for="alertasMedicas">Alergias / Condiciones Crónicas Críticas</label>
+                            <input type="text" id="alertasMedicas" placeholder="Ej: Alérgico a la Penicilina, Diabético, etc.">
+                        </div>
+
+                        <div class="form-group" style="margin-top: 20px;">
+                            <button type="submit" class="btn-primary" id="btnGuardarPadrón"><i class="material-icons" style="margin-right:5px;">how_to_reg</i> Registrar en Padrón</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- SECCIÓN 3: CONTROL DE INGRESO -->
+                <div class="card seccion-desactivada" id="seccionTransito">
+                    <h2><i class="material-icons">login</i> 3. Panel de Movimiento Comunitario</h2>
+                    <form id="formTransito" onsubmit="registrarIngresoBitacora(event)">
+                        <div class="form-group">
+                            <label for="transitoCentro">Centro de Destino</label>
+                            <select id="transitoCentro">
+                                <option value="Any Williams">1. Any Williams (Desayuno)</option>
+                                <option value="Chepe se baña">2. Chepe se baña (Mañana)</option>
+                                <option value="IAFA">3. IAFA (Atención de adicciones)</option>
+                                <option value="Centro Dormitorio">4. Centro Dormitorio (Punto nocturno)</option>
+                                <option value="Centros de Salud">5. Centros de Salud (Clínica / CCSS)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="transitoAccionFija">Acción a Registrar</label>
+                            <select id="transitoAccionFija" disabled style="background-color: #f1f5f9; font-weight: bold; color: var(--success-color);">
+                                <option value="Ingreso">➡️ REGISTRAR INGRESO AL CENTRO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="transitoAdherencia">Validación TARV [Brecha B2]</label>
+                            <select id="transitoAdherencia">
+                                <option value="Sí reporta toma">Sí reporta toma correspondiente a hoy</option>
+                                <option value="Toma Supervisada">Toma realizada bajo supervisión en el centro</option>
+                                <option value="No reporta toma">No ha tomado la dosis o no porta el medicamento</option>
+                                <option value="No aplica">No se encuentra bajo esquema actualmente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="transitoNotas">Notas y Observaciones de Entrada</label>
+                            <textarea id="transitoNotas" rows="2" placeholder="Detalle el ingreso del habitante..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-success"><i class="material-icons" style="margin-right:5px;">save</i> Guardar Entrada</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 📊 SECCIÓN 4: BITÁCORA GLOBAL PERSISTENTE CON FILTROS Y COPIAS DE SEGURIDAD -->
+    <div id="globalHistoryContainer">
+        <div class="card">
+            <h2><i class="material-icons">history_toggle_off</i> Bitácora e Historial de Movimientos en Tiempo Real</h2>
+            
+            <!-- 🛡️ NUEVO PANEL DE RESPALDO Y SEGURIDAD EXTRA -->
+            <!---<div class="backup-panel">
+                <span style="font-size:0.85rem; font-weight:bold; color:#1e40af; display:flex; align-items:center; gap:4px;">
+                    <i class="material-icons" style="font-size:1.1rem;">shield</i> Protección de Datos:
+                </span>
+                <button class="btn-tool" onclick="exportarExcelCSV()"><i class="material-icons">download_for_offline</i> Exportar a Excel (CSV)</button>
+                <button class="btn-tool" style="background-color:#0284c7;" onclick="descargarCopiaSeguridadJSON()"><i class="material-icons">backup</i> Descargar Copia de Seguridad (.json)</button>
+                
+                <label style="display:inline-block; margin-bottom:0; font-weight:normal;">
+                    <span class="btn-tool" style="background-color:#16a34a; display:inline-flex; border-radius:8px; cursor:pointer;">
+                        <i class="material-icons">file_upload</i> Importar/Restaurar Respaldo
+                    </span>
+                    <input type="file" id="archivoBackup" accept=".json" style="display:none;" onchange="cargarCopiaSeguridadJSON(event)">
+                </label>
+            </div>---->
+
+            <!-- PANEL DE FILTROS DINÁMICOS -->
+            <div class="filter-bar">
+                <div class="form-group">
+                    <label for="filtroBusqueda"><i class="material-icons" style="font-size: 0.9rem; vertical-align: middle;">search</i> Buscar Habitante</label>
+                    <input type="text" id="filtroBusqueda" placeholder="Nombre o Cédula..." oninput="actualizarTablaHistorial()">
+                </div>
+                <div class="form-group">
+                    <label for="filtroCentro"><i class="material-icons" style="font-size: 0.9rem; vertical-align: middle;">store</i> Filtrar por Centro</label>
+                    <select id="filtroCentro" onchange="actualizarTablaHistorial()">
+                        <option value="TODOS">-- Todos los Centros --</option>
+                        <option value="Any Williams">Any Williams</option>
+                        <option value="Chepe se baña">Chepe se baña</option>
+                        <option value="IAFA">IAFA</option>
+                        <option value="Centro Dormitorio">Centro Dormitorio</option>
+                        <option value="Centros de Salud">Centros de Salud</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filtroEstado"><i class="material-icons" style="font-size: 0.9rem; vertical-align: middle;">flaky</i> Filtrar por Estado</label>
+                    <select id="filtroEstado" onchange="actualizarTablaHistorial()">
+                        <option value="TODOS">-- Todos los Estados --</option>
+                        <option value="Ingreso">Solo en Centro (Ingresos)</option>
+                        <option value="Egreso">Ya Egresados</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TABLA RESPONSIVA -->
+            <div class="table-responsive">
+                <table id="tablaHistorial">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Habitante / Identificador</th>
+                            <th>Centro</th>
+                            <th>Estado</th>
+                            <th>Hora Entrada</th>
+                            <th>Hora Salida</th>
+                            <th>Ficha de Campo y Trazabilidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EGRESO -->
+    <div id="modalSalida" class="modal">
+        <div class="modal-content">
+            <span class="material-icons close-modal" onclick="cerrarModal()">close</span>
+            <h3 style="margin-bottom: 15px; color: var(--primary-color); display:flex; align-items:center;">
+                <i class="material-icons" style="margin-right:5px; color:var(--warning-color)">logout</i> Confirmar Salida
+            </h3>
+            <p id="modalInfoHabitante" style="font-size:0.9rem; margin-bottom:15px; color:#475569;"></p>
+            <form id="formModalSalida" onsubmit="guardarSalidaEfectiva(event)">
+                <input type="hidden" id="modalRegistroId">
+                <div class="form-group">
+                    <label for="modalNotasSalida">Descripción relevante de Salida o Guía</label>
+                    <textarea id="modalNotasSalida" rows="3" placeholder="Escriba aquí las observaciones al salir..." required></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="background-color: var(--warning-color); margin-top:10px;">
+                    <i class="material-icons" style="margin-right: 5px;">check</i> Confirmar y Guardar Egreso
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'bitacoraRuta_MANU';
+        const PADRON_KEY = 'habitantesDB_MANU';
+        
+        let habitantesDB = {};
+        let bitacoraRuta = [];
+        
+        // Carga desde Almacenamiento Local Fijo
+        try { habitantesDB = JSON.parse(localStorage.getItem(PADRON_KEY)) || {}; } catch (e) { habitantesDB = {}; }
+        try { bitacoraRuta = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { bitacoraRuta = []; }
+
+        // Inyector inicial por defecto si el navegador está en cero absoluto
+        if (bitacoraRuta.length === 0) {
+            const fechaHoy = new Date().toLocaleDateString('es-CR');
+            if (Object.keys(habitantesDB).length === 0) {
+                habitantesDB["111111111"] = { cedula: "111111111", nombre: "Juan Carlos Pérez", provincia: "San José", canton: "Central", distrito: "Hospital", aseguramiento: "No Asegurado", alertasMedicas: "Ninguna" };
+                habitantesDB["222222222"] = { cedula: "222222222", nombre: "María Esquivel Solano", provincia: "San José", canton: "Goicoechea", distrito: "Purral", aseguramiento: "Por el Estado", alertasMedicas: "Alérgica Penicilina" };
+                localStorage.setItem(PADRON_KEY, JSON.stringify(habitantesDB));
+            }
+            bitacoraRuta = [
+                { id: 100002, cedula: "222222222", nombre: "María Esquivel Solano", geografia: "San José, Goicoechea, Purral", referencia: "Ninguno (S/N)", alertas: "Alérgica Penicilina", aseg: "Por el Estado", centro: "Chepe se baña", estadoMovimiento: "Ingreso", fecha: fechaHoy, horaEntrada: "08:15:22", horaSalida: "---", adherencia: "Toma Supervisada", notesEntrada: "Ingresa en orden para el servicio de lavado.", notasSalida: "" },
+                { id: 100001, cedula: "111111111", nombre: "Juan Carlos Pérez", geografia: "San José, Central, Hospital", referencia: "Hno: Pedro Pérez", alertas: "Ninguna", aseg: "No Asegurado", centro: "Any Williams", estadoMovimiento: "Egreso", fecha: fechaHoy, horaEntrada: "06:30:00", horaSalida: "07:25:10", adherencia: "Sí reporta toma", notesEntrada: "Asiste temprano por ración matutina.", notasSalida: "Retiro exitoso." }
+            ];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoraRuta));
+        }
+
+        let temporizadorInactividad;
+        const TIEMPO_LIMITE_MS = 30 * 60 * 1000; 
+
+        const inputBusqueda = document.getElementById('cedulaBusqueda');
+        const badgeNuevo = document.getElementById('badgeNuevo');
+        const badgeExistente = document.getElementById('badgeExistente');
+        const seccionFicha = document.getElementById('seccionFicha');
+        const seccionTransito = document.getElementById('seccionTransito');
+        let llaveActivaEncontrada = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            resetearUIAlInicio();
+            actualizarTablaHistorial();
+        });
+
+        function validarCredenciales(event) {
+            event.preventDefault();
+            const u = document.getElementById('inputUser').value.trim();
+            const p = document.getElementById('inputPass').value;
+
+            if (u === "admin_manu" && p === "manu2026") {
+                document.getElementById('errorMsg').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainSystem').style.display = 'block';
+                actualizarTablaHistorial();
+                iniciarRastreoInactividad();
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('inputPass').value = "";
+            }
+        }
+
+        function iniciarRastreoInactividad() {
+            resetearTemporizador();
+            document.onmousemove = resetearTemporizador;
+            document.onkeypress = resetearTemporizador;
+            document.onclick = resetearTemporizador;
+        }
+
+        function resetearTemporizador() {
+            clearTimeout(temporizadorInactividad);
+            temporizadorInactividad = setTimeout(() => {
+                alert("Sesión cerrada automáticamente por inactividad (30 minutos).");
+                ejecutarCierreEfectivo();
+            }, TIEMPO_LIMITE_MS);
+        }
+
+        function cerrarSesionManual() {
+            if (confirm("¿Desea salir del entorno operativo?")) ejecutarCierreEfectivo();
+        }
+
+        function ejecutarCierreEfectivo() {
+            clearTimeout(temporizadorInactividad);
+            document.getElementById('inputUser').value = "";
+            document.getElementById('inputPass').value = "";
+            document.getElementById('mainSystem').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            inputBusqueda.value = '';
+            resetearUIAlInicio();
+        }
+
+        inputBusqueda.addEventListener('input', () => {
+            const consulta = inputBusqueda.value.trim().toLowerCase();
+            if (consulta.length === 0) { resetearUIAlInicio(); return; }
+
+            let llaveExistente = habitantesDB[consulta] ? consulta : Object.keys(habitantesDB).find(k => 
+                habitantesDB[k].cedula.toLowerCase() === consulta || habitantesDB[k].nombre.toLowerCase() === consulta
+            );
+
+            if (llaveExistente) {
+                llaveActivaEncontrada = llaveExistente;
+                badgeNuevo.style.display = 'none';
+                badgeExistente.style.display = 'block';
+                seccionFicha.classList.add('seccion-oculta');
+                seccionTransito.classList.remove('seccion-desactivada');
+                toggleRequeridosFicha(false);
+            } else {
+                llaveActivaEncontrada = consulta;
+                badgeNuevo.style.display = 'block';
+                badgeExistente.style.display = 'none';
+                seccionFicha.classList.remove('seccion-oculta');
+                seccionFicha.classList.remove('seccion-desactivada');
+                seccionTransito.classList.add('seccion-desactivada');
+                toggleRequeridosFicha(true);
+            }
+        });
+
+        function resetearUIAlInicio() {
+            badgeNuevo.style.display = 'none'; badgeExistente.style.display = 'none';
+            seccionFicha.classList.remove('seccion-oculta');
+            seccionFicha.classList.add('seccion-desactivada');
+            seccionTransito.classList.add('seccion-desactivada');
+            llaveActivaEncontrada = "";
+            toggleRequeridosFicha(false);
+        }
+
+        function toggleRequeridosFicha(valor) {
+            document.getElementById('nombreCompleto').required = valor;
+            document.getElementById('nacimiento').required = valor;
+        }
+
+        function registrarNuevoHabitante(event) {
+            event.preventDefault();
+            const idIngresado = inputBusqueda.value.trim();
+            const nombreIngresado = document.getElementById('nombreCompleto').value.trim();
+
+            habitantesDB[idIngresado.toLowerCase()] = {
+                cedula: idIngresado, nombre: nombreIngresado,
+                aseguramiento: document.getElementById('aseguramiento').value,
+                provincia: document.getElementById('provincia').value,
+                canton: document.getElementById('canton').value.trim() || 'No indicado',
+                distrito: document.getElementById('distrito').value.trim() || 'No indicado',
+                otrasSenas: document.getElementById('otrasSenas').value.trim() || 'Sin señas',
+                nombreReferencia: document.getElementById('nombreReferencia').value.trim() || 'Ninguno',
+                telefonoReferencia: document.getElementById('telefonoReferencia').value.trim() || 'S/N',
+                alertasMedicas: document.getElementById('alertasMedicas').value.trim() || 'Ninguna'
+            };
+
+            localStorage.setItem(PADRON_KEY, JSON.stringify(habitantesDB));
+            document.getElementById('formFicha').reset();
+            inputBusqueda.dispatchEvent(new Event('input'));
+            alert('Habitante registrado en el padrón local.');
+        }
+
+        function registrarIngresoBitacora(event) {
+            event.preventDefault();
+            const habitanteInfo = habitantesDB[llaveActivaEncontrada];
+            if (!habitanteInfo) return;
+
+            const ahora = new Date();
+            const nuevaMarca = {
+                id: Date.now(), cedula: habitanteInfo.cedula, nombre: habitanteInfo.nombre,
+                geografia: `${habitanteInfo.provincia}, ${habitanteInfo.canton}, ${habitanteInfo.distrito}`,
+                referencia: `${habitanteInfo.nombreReferencia} (${habitanteInfo.telefonoReferencia})`,
+                alertas: habitanteInfo.alertasMedicas, aseg: habitanteInfo.aseguramiento,
+                centro: document.getElementById('transitoCentro').value, estadoMovimiento: 'Ingreso', 
+                fecha: ahora.toLocaleDateString('es-CR'),
+                horaEntrada: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                horaSalida: '---', adherencia: document.getElementById('transitoAdherencia').value,
+                notesEntrada: document.getElementById('transitoNotas').value || 'Sin observaciones.', notasSalida: ''
+            };
+
+            bitacoraRuta.unshift(nuevaMarca);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoraRuta));
+            document.getElementById('formTransito').reset();
+            inputBusqueda.value = '';
+            resetearUIAlInicio();
+            actualizarTablaHistorial();
+        }
+
+        function abrirModalSalida(idRegistro) {
+            const reg = bitacoraRuta.find(r => r.id === idRegistro);
+            if (!reg) return;
+            document.getElementById('modalRegistroId').value = idRegistro;
+            document.getElementById('modalInfoHabitante').innerHTML = `Estableciendo egreso para: <b>${reg.nombre}</b>`;
+            document.getElementById('modalSalida').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalSalida').style.display = 'none';
+            document.getElementById('formModalSalida').reset();
+        }
+
+        function guardarSalidaEfectiva(event) {
+            event.preventDefault();
+            const idRegistro = parseInt(document.getElementById('modalRegistroId').value, 10);
+            const notaSalida = document.getElementById('modalNotasSalida').value.trim();
+            const indice = bitacoraRuta.findIndex(r => r.id === idRegistro);
+
+            if (indice !== -1) {
+                bitacoraRuta[indice].horaSalida = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                bitacoraRuta[indice].estadoMovimiento = 'Egreso'; 
+                bitacoraRuta[indice].notasSalida = notaSalida;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoraRuta));
+                cerrarModal();
+                actualizarTablaHistorial();
+            }
+        }
+
+        function actualizarTablaHistorial() {
+            const tbody = document.querySelector('#tablaHistorial tbody');
+            if(!tbody) return; tbody.innerHTML = '';
+
+            const queryBusqueda = document.getElementById('filtroBusqueda').value.trim().toLowerCase();
+            const centroSeleccionado = document.getElementById('filtroCentro').value;
+            const estadoSeleccionado = document.getElementById('filtroEstado').value;
+
+            const registrosFiltrados = bitacoraRuta.filter(reg => {
+                const cumpleTexto = !queryBusqueda || reg.nombre.toLowerCase().includes(queryBusqueda) || reg.cedula.toLowerCase().includes(queryBusqueda);
+                const cumpleCentro = (centroSeleccionado === 'TODOS') || (reg.centro === centroSeleccionado);
+                const cumpleEstado = (estadoSeleccionado === 'TODOS') || (reg.estadoMovimiento === estadoSeleccionado);
+                return cumpleTexto && cumpleCentro && cumpleEstado;
+            });
+
+            if (registrosFiltrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:30px;">📊 No hay registros coincidentes.</td></tr>`;
+                return;
+            }
+
+            registrosFiltrados.forEach(reg => {
+                const fila = tbody.insertRow();
+                let centroClass = reg.centro === 'Any Williams' ? 'badge-any' : reg.centro === 'Chepe se baña' ? 'badge-chepe' : reg.centro === 'IAFA' ? 'badge-iafa' : reg.centro === 'Centro Dormitorio' ? 'badge-dormitorio' : 'badge-salud';
+                
+                let botonAccion = reg.estadoMovimiento === 'Ingreso' ? 
+                    `<button class="btn-warning" onclick="abrirModalSalida(${reg.id})">Egresar</button>` : 
+                    `<span style="color:#16a34a; font-weight:700; font-size:0.8rem;">Concluido</span>`;
+
+                fila.innerHTML = `
+                    <td><small>${reg.fecha}</small></td>
+                    <td><b>${reg.nombre}</b><br><small>ID: ${reg.cedula}</small></td>
+                    <td><span class="badge ${centroClass}">${reg.centro}</span></td>
+                    <td><span class="mov-badge ${reg.estadoMovimiento === 'Ingreso' ? 'mov-ingreso' : 'mov-egreso'}">${reg.estadoMovimiento}</span></td>
+                    <td><b style="color:var(--success-color);">${reg.horaEntrada}</b></td>
+                    <td><b style="color:var(--warning-color);">${reg.horaSalida}</b></td>
+                    <td>
+                        <small><b>TARV:</b> ${reg.adherencia}</small><br>
+                        <small>📍 ${reg.geografia}</small><br>
+                        <small><b>[Entrada]:</b> ${reg.notesEntrada}</small>
+                        ${reg.notasSalida ? `<br><small style="color:#ea580c;"><b>[Salida]:</b> ${reg.notasSalida}</small>` : ''}
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            ${botonAccion}
+                            <button class="btn-delete" onclick="eliminarRegistroRuta(${reg.id})"><i class="material-icons" style="font-size:1.1rem;">delete_outline</i></button>
+                        </div>
+                    </td>
+                `;
+            });
+        }
+
+        function eliminarRegistroRuta(idTransaccion) {
+            if (confirm('¿Desea borrar este registro de la bitácora?')) {
+                bitacoraRuta = bitacoraRuta.filter(reg => reg.id !== idTransaccion);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoraRuta));
+                actualizarTablaHistorial();
+            }
+        }
+
+        // 🛡️ FUNCIONES DE SEGURIDAD EXPORTAR / IMPORTAR (EXCEL Y RESPALDOS RESISTENTES)
+        function exportarExcelCSV() {
+            if (bitacoraRuta.length === 0) { alert("No hay datos para exportar."); return; }
+            let csv = "\uFEFFFecha;Identificador;Nombre;Centro;Estado;Hora Entrada;Hora Salida;TARV;Notas\n";
+            bitacoraRuta.forEach(r => {
+                csv += `"${r.fecha}";"${r.cedula}";"${r.nombre}";"${r.centro}";"${r.estadoMovimiento}";"${r.horaEntrada}";"${r.horaSalida}";"${r.adherencia}";"${r.notesEntrada.replace(/"/g, '""')}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `Bitacora_MANU_${new Date().toLocaleDateString('es-CR').replace(/\//g, '-')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function descargarCopiaSeguridadJSON() {
+            const dataCompleta = { padron: habitantesDB, bitacora: bitacoraRuta };
+            const blob = new Blob([JSON.stringify(dataCompleta, null, 2)], { type: 'application/json' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `RESPALDO_SISTEMA_MANU_${Date.now()}.json`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function cargarCopiaSeguridadJSON(event) {
+            const archivo = event.target.files[0];
+            if (!archivo) return;
+
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (datos.padron && datos.bitacora) {
+                        habitantesDB = datos.padron;
+                        bitacoraRuta = datos.bitacora;
+                        
+                        localStorage.setItem(PADRON_KEY, JSON.stringify(habitantesDB));
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoraRuta));
+                        
+                        actualizarTablaHistorial();
+                        alert("¡Respaldo restaurado con éxito total! Todos tus registros anteriores vuelven a estar visibles en la tabla.");
+                    } else {
+                        alert("El archivo seleccionado no tiene el formato correcto del sistema MANU.");
+                    }
+                } catch (err) {
+                    alert("Error al leer el archivo. Asegúrate de cargar un respaldo .json válido.");
+                }
+            };
+            lector.readAsText(archivo);
+            event.target.value = ''; // Limpiar campo de selección
+        }
+    </script>
+</body>
+</html>
