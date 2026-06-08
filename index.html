@@ -189,30 +189,19 @@
 
     <!-- 🖥️ ENTORNO DEL SISTEMA GENERAL -->
     <div id="mainSystem">
-        <header>
-            <div class="logo-area">
-                <div class="ribbon-solidarity">🎗️</div>
-                <div>
-                    <h1>ASOCIACIÓN MANU</h1>
-                    <span>La Ruta de la Adherencia (RATM) • Monitoreo de Habitantes</span>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                <div class="user-badge">
-                    <i class="material-icons" style="font-size: 1.2rem;">verified_user</i> 
-                    <span id="lblTipoUsuario">Cargando...</span>
-                </div>
-                <!-- PANEL EXCLUSIVO ADMIN CON BOTÓN EXCEL -->
-                <button id="btnExportarExcel" class="btn-excel admin-only" onclick="exportarDataHabitantesExcel()">
-                    <i class="material-icons" style="font-size: 1.1rem;">file_download</i> <span>Guardar Data (Carpetas)</span>
-                </button>
-                <button id="btnToggleView" class="btn-toggle-view admin-only" onclick="alternarVistaExpress()">
-                    <i class="material-icons" style="font-size: 1.1rem;">visibility</i> <span>Cambiar a Vista Usuario</span>
-                </button>
-                <button id="btnRefreshData" class="btn-refresh" onclick="refreshSystemData()"><i class="material-icons" style="font-size:1rem;">sync</i> Refrescar</button>
-                <button class="btn-logout" id="btnCerrarSesion"><i class="material-icons" style="font-size:1.1rem;">power_settings_new</i> Salir</button>
-            </div>
-        </header>
+        
+        <header style="background-color: #ffffff; border-bottom: 3px solid var(--primary-color); padding: 12px 20px;">
+    <div style="display: flex; align-items: center; gap: 15px; max-width: 1400px; margin: 0 auto;">
+        
+        <img src="logo-manu.png" alt="Logo Asociación MANU" style="height: 65px; width: auto; object-fit: contain;">
+        
+        <div>
+            <h1 style="color: var(--primary-color); font-size: 24px; margin: 0; font-family: sans-serif; letter-spacing: 0.5px;">ASOCIACIÓN MANU</h1>
+            <span style="color: var(--secondary-color); font-size: 13px; font-weight: bold; font-family: sans-serif; display: block; margin-top: 2px;">La Ruta de la Adherencia (RATM)</span>
+        </div>
+        
+    </div>
+</header>
 
         <main>
             <!-- 📍 RUTA / LÍNEA DE TIEMPO DINÁMICA -->
